@@ -131,7 +131,7 @@
         listaAmigosUl.innerHTML = '<li>Buscando amigos...</li>';
 
         try {
-            const response = await fetch('TU_URL_DE_VERCEL/amigos_en_comun', {
+            const response = await fetch('https://mi-robot-de-amigos.vercel.app/amigos_en_comun', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
