@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Búsqueda de Amigos en Común</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+            flex-direction: column;
+        }
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+        }
+        h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .input-group input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #resultado {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            text-align: left;
+            display: none;
+        }
+        #resultado h2 {
+            margin-top: 0;
+            color: #555;
+        }
+        .friend-list {
+            list-style: none;
+            padding: 0;
+        }
+        .friend-list li {
+            background-color: #d1e7dd;
+            margin-bottom: 10px;
+            padding: 12px;
+            border-radius: 5px;
+            border-left: 5px solid #28a745;
+            font-weight: bold;
+            color: #155724;
+        }
+        .no-friends {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Amigos en Común</h1>
+    <div class="input-group">
+        <label for="usuario1">Nombre de usuario 1:</label>
+        <input type="text" id="usuario1" placeholder="Ej: @korkas234">
+    </div>
+    <div class="input-group">
+        <label for="usuario2">Nombre de usuario 2:</label>
+        <input type="text" id="usuario2" placeholder="Ej: @korkas321">
+    </div>
+    <button id="buscarBtn">Iniciar Búsqueda</button>
+
+    <div id="resultado">
+        <h2>Amigos en Común:</h2>
+        <ul id="listaAmigosComun" class="friend-list">
+            </ul>
+    </div>
+</div>
+
+<script>
+    document.getElementById('buscarBtn').addEventListener('click', async function() {
+        const usuario1 = document.getElementById('usuario1').value.trim();
+        const usuario2 = document.getElementById('usuario2').value.trim();
+        const resultadoDiv = document.getElementById('resultado');
+        const listaAmigosUl = document.getElementById('listaAmigosComun');
+
+        if (!usuario1 || !usuario2) {
+            alert('Por favor, ingresa ambos nombres de usuario.');
+            return;
+        }
+
+        resultadoDiv.style.display = 'block';
+        listaAmigosUl.innerHTML = '<li>Buscando amigos...</li>';
+
+        try {
+            const response = await fetch('TU_URL_DE_VERCEL/amigos_en_comun', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    usuario1: usuario1,
+                    usuario2: usuario2
+                })
+            });
+
+            const data = await response.json();
+
+            listaAmigosUl.innerHTML = '';
+
+            if (data.success && data.amigos.length > 0) {
+                data.amigos.forEach(amigo => {
+                    const li = document.createElement('li');
+                    li.textContent = amigo;
+                    listaAmigosUl.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.textContent = data.message || "No se encontraron amigos en común.";
+                li.className = 'no-friends';
+                listaAmigosUl.appendChild(li);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            listaAmigosUl.innerHTML = '<li class="no-friends">Error al conectar con el servidor.</li>';
+        }
+    });
+</script>
+
+</body>
+</html>
